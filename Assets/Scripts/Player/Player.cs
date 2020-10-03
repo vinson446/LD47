@@ -16,6 +16,13 @@ public class Player : MonoBehaviour
     Vector3 moveDirection = Vector3.zero;
     CharacterController charController;
 
+    [Header("Game Settings")]
+    public Monster monster;
+    public Camera cam;
+    public bool monsterOnScreen;
+    public float timerForAggro;
+    public float timer;
+
     [Header("Sound Settings")]
     public float moveVolume;
     public float movePitch;
@@ -43,6 +50,23 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Vector3 screenPoint = cam.WorldToViewportPoint(monster.transform.position);
+        monsterOnScreen = screenPoint.z > 0 && screenPoint.x > 0 && screenPoint.x < 1 && screenPoint.y > 0 && screenPoint.y < 1;
+
+        if (monsterOnScreen)
+        {
+            timer += Time.deltaTime;
+            if (timer >= timerForAggro)
+            {
+                timer = 0;
+                monster.isAggro = true;
+            }
+        }
+        else
+        {
+            monster.isAggro = false;
+        }
+
         if (charController.isGrounded)
         {
             moveDirection = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
