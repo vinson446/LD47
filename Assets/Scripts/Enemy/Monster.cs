@@ -33,6 +33,7 @@ public class Monster : MonoBehaviour
 
     // references
     Player player;
+    GameManager gameManager;
 
     private void Awake()
     {
@@ -136,12 +137,25 @@ public class Monster : MonoBehaviour
         isSprinting = false;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.tag == "Player")
+        if (other.gameObject.tag == "Player")
         {
-            agent.isStopped = true;
-            SceneManager.LoadScene("Main Menu");
+            gameManager = FindObjectOfType<GameManager>();
+
+            if (!gameManager.hasFailed)
+            {
+                gameManager.hasFailed = true;
+            }
+
+            if (gameManager.numCluesFound == 4)
+            {
+                SceneManager.LoadScene("Main Menu");
+            }
+            else
+            {
+                SceneManager.LoadScene("Game");
+            }
         }
     }
 }

@@ -12,10 +12,14 @@ public class MonsterAnimator : MonoBehaviour
     Monster monster;
     Animator animator;
 
+    Player player;
+
     private void Awake()
     {
         monster = GetComponent<Monster>();
         animator = GetComponent<Animator>();
+
+        player = FindObjectOfType<Player>();
     }
 
     void OnIdle()
@@ -31,6 +35,7 @@ public class MonsterAnimator : MonoBehaviour
     void OnSprinting()
     {
         animator.CrossFadeInFixedTime(sprintState, 0.2f);
+        player.timerForAggro = Random.Range(0f, 3f);
     }
 
     void OnRoaring()

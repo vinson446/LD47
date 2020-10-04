@@ -17,8 +17,8 @@ public class Player : MonoBehaviour
     CharacterController charController;
 
     [Header("Game Settings")]
-    public Monster monster;
-    public Camera cam;
+    public float interactRange;
+
     public bool monsterOnScreen;
     public float timerForAggro;
     public float timer;
@@ -35,6 +35,10 @@ public class Player : MonoBehaviour
     public AudioClip[] audioClips;
     AudioSource audioSource;
 
+    [Header("References")]
+    public Monster monster;
+    public Camera cam;
+
     private void Awake()
     {
         charController = GetComponent<CharacterController>();
@@ -44,7 +48,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        timerForAggro = Random.Range(0f, 3f);
     }
 
     // Update is called once per frame
@@ -61,6 +65,10 @@ public class Player : MonoBehaviour
                 timer = 0;
                 monster.isAggro = true;
             }
+        }
+        else if (Vector3.Distance(transform.position, monster.transform.position) < 20)
+        {
+            monster.isAggro = true;
         }
         else
         {
@@ -91,11 +99,6 @@ public class Player : MonoBehaviour
                 isWalking = true;
                 moveDirection = moveDirection * moveSpeed;
             }
-
-            if (Input.GetKey(KeyCode.Space))
-            {
-                moveDirection.y = jumpSpeed;
-            }
         }
 
         // apply gravity
@@ -114,6 +117,24 @@ public class Player : MonoBehaviour
             else
             {
                 PlaySound(0, sprintingVolume, sprintingPitch);
+            }
+        }
+
+        Interact();
+    }
+
+    void Interact()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Collider[] coll = Physics.OverlapSphere(transform.position, interactRange);
+            foreach (Collider c in coll)
+            {
+                Clue clue = c.GetComponent<Clue>();
+                if (clue != null)
+                {
+                    clue.PickUpClue();
+                }
             }
         }
     }
@@ -141,5 +162,11 @@ public class Player : MonoBehaviour
             yield return new WaitForSeconds(sprintingInterval);
             canPlaySound = true;
         }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, interactRange);
     }
 }
