@@ -22,10 +22,6 @@ public class Monster : MonoBehaviour
     NavMeshAgent agent;
     Transform target;
 
-    [Header("Sound Settings")]
-    public AudioClip[] audioClips;
-    AudioSource audioSource;
-
     [Header("Animation Checks")]
     // animation checks
     public bool isMoving;
@@ -35,10 +31,12 @@ public class Monster : MonoBehaviour
     Player player;
     GameManager gameManager;
 
+    MonsterAnimator monsterAnimator;
+
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
-        audioSource = GetComponent<AudioSource>();
+        monsterAnimator = GetComponent<MonsterAnimator>();
     }
 
     // Start is called before the first frame update
@@ -128,6 +126,10 @@ public class Monster : MonoBehaviour
         if (!isSprinting)
         {
             MonsterSprinting.Invoke();
+
+            if (Vector3.Distance(transform.position, target.transform.position) < 50)
+                monsterAnimator.PlayRoarSound();
+
             isSprinting = true;
         }
     }

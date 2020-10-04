@@ -14,10 +14,24 @@ public class MonsterAnimator : MonoBehaviour
 
     Player player;
 
+    [Header("Sound Settings")]
+    public float moveVolume;
+    public float movePitch;
+    public float moveInterval;
+    public float sprintingVolume;
+    public float sprintingPitch;
+    public float sprintingInterval;
+    public bool firstTimeRoaring = false;
+
+    public AudioClip[] audioClips;
+    public AudioSource roarSource;
+    AudioSource audioSource;
+
     private void Awake()
     {
         monster = GetComponent<Monster>();
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
 
         player = FindObjectOfType<Player>();
     }
@@ -30,17 +44,68 @@ public class MonsterAnimator : MonoBehaviour
     void OnMove()
     {
         animator.CrossFadeInFixedTime(moveState, 0.2f);
+
+        PlayMovingSound(0, moveVolume, movePitch);
     }
 
     void OnSprinting()
     {
         animator.CrossFadeInFixedTime(sprintState, 0.2f);
         player.timerForAggro = Random.Range(0f, 3f);
+
+        PlayMovingSound(0, sprintingVolume, sprintingPitch);
     }
 
     void OnRoaring()
     {
         animator.CrossFadeInFixedTime(roarState, 0.2f);
+    }
+
+    void PlayMovingSound(int index, float volume, float pitch)
+    {
+        StopAllCoroutines();
+        StartCoroutine(PlaySoundCoroutine(index, volume, pitch));
+    }
+
+    public void PlayRoarSound()
+    {
+        if (!firstTimeRoaring)
+        {
+            roarSource.PlayOneShot(audioClips[1]);
+            firstTimeRoaring = true;
+        }
+        else
+        {
+            float tmp = Random.Range(0, 4);
+            if (tmp == 0)
+            {
+                roarSource.PlayOneShot(audioClips[1]);
+            }
+        }
+    }
+
+    IEnumerator PlaySoundCoroutine(int index, float volume, float pitch)
+    {
+        audioSource.volume = volume;
+        audioSource.pitch = pitch;
+        audioSource.clip = audioClips[index];
+
+        while (true)
+        {
+            if (audioSource.isPlaying)
+                audioSource.Stop();
+
+            audioSource.Play();
+
+            if (!monster.isAggro)
+            {
+                yield return new WaitForSeconds(moveInterval);
+            }
+            else
+            {
+                yield return new WaitForSeconds(sprintingInterval);
+            }
+        }
     }
 
     private void OnEnable()

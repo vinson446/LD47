@@ -19,7 +19,9 @@ public class Player : MonoBehaviour
     [Header("Game Settings")]
     public float interactRange;
 
+    public bool seeMonsterFirstTime;
     public bool monsterOnScreen;
+
     public float timerForAggro;
     public float timer;
 
@@ -37,7 +39,11 @@ public class Player : MonoBehaviour
 
     [Header("References")]
     public Monster monster;
+    public MonsterAnimator monsterAnimator;
+    public Collider monsterCollider;
     public Camera cam;
+
+    Plane[] planes;
 
     private void Awake()
     {
@@ -57,6 +63,18 @@ public class Player : MonoBehaviour
         Vector3 screenPoint = cam.WorldToViewportPoint(monster.transform.position);
         monsterOnScreen = screenPoint.z > 0 && screenPoint.x > 0 && screenPoint.x < 1 && screenPoint.y > 0 && screenPoint.y < 1;
 
+        /*
+        planes = GeometryUtility.CalculateFrustumPlanes(cam);
+        if (GeometryUtility.TestPlanesAABB(planes, monsterCollider.bounds))
+        {
+            monsterOnScreen = true;
+        }
+        else
+        {
+            monsterOnScreen = false;
+        }
+        */
+
         if (monsterOnScreen)
         {
             timer += Time.deltaTime;
@@ -65,8 +83,15 @@ public class Player : MonoBehaviour
                 timer = 0;
                 monster.isAggro = true;
             }
+
+            if (!seeMonsterFirstTime && monsterAnimator.enabled)
+            {
+                monsterAnimator.PlayRoarSound();
+
+                seeMonsterFirstTime = true;
+            }
         }
-        else if (Vector3.Distance(transform.position, monster.transform.position) < 20)
+        else if (Vector3.Distance(transform.position, monster.transform.position) < 30)
         {
             monster.isAggro = true;
         }
@@ -112,11 +137,11 @@ public class Player : MonoBehaviour
         {
             if (isWalking)
             {
-                PlaySound(0, moveVolume, movePitch);
+                PlaySound(0, Random.Range(moveVolume - 0.03f, moveVolume + 0.03f), Random.Range(movePitch - 0.03f, movePitch + 0.03f));
             }
             else
             {
-                PlaySound(0, sprintingVolume, sprintingPitch);
+                PlaySound(0, Random.Range(sprintingVolume - 0.03f, sprintingVolume + 0.03f), Random.Range(sprintingPitch - 0.03f, sprintingPitch + 0.03f));
             }
         }
 
