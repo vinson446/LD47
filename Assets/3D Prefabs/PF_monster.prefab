@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6904234286281806250}
   - component: {fileID: 8661604922358670688}
   m_Layer: 0
-  m_Name: monster
+  m_Name: PF_monster
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -52,7 +52,7 @@ MeshRenderer:
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_MotionVectors: 1
-  m_LightProbeUsage: 1
+  m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RenderingLayerMask: 1
