@@ -39,6 +39,12 @@ public class MainMenu : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.None;
 
+        GameManager gameManager = FindObjectOfType<GameManager>();
+        if (gameManager != null)
+        {
+            Destroy(gameManager.gameObject);
+        }
+
         StartCoroutine(Fade(1));
     }
 
@@ -65,12 +71,13 @@ public class MainMenu : MonoBehaviour
 
     IEnumerator StartGame()
     {
+        audioSource.PlayOneShot(clips[0]);
         startGame = true;
         playText.DOColor(clickColor, colorTransitionTime);
 
-        gameNameText.DOFade(0, fadeInTime);
-        playText.DOFade(0, fadeInTime);
-        quitText.DOFade(0, fadeInTime);
+        //gameNameText.DOFade(0, fadeInTime);
+        //playText.DOFade(0, fadeInTime);
+        //quitText.DOFade(0, fadeInTime);
 
         float currentTime = 0;
         while (currentTime < 2)
@@ -99,6 +106,7 @@ public class MainMenu : MonoBehaviour
 
     IEnumerator Quit()
     {
+        audioSource.PlayOneShot(clips[0]);
         quitText.DOColor(clickColor, colorTransitionTime);
 
         yield return new WaitForSeconds(1);

@@ -9,11 +9,15 @@ public class Clue : MonoBehaviour
     DialogueManager dialogueManager;
     GameManager gameManager;
 
+    AudioSource audioSource;
+
     // Start is called before the first frame update
     void Start()
     {
         dialogueManager = FindObjectOfType<DialogueManager>();
         gameManager = FindObjectOfType<GameManager>();
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -28,6 +32,11 @@ public class Clue : MonoBehaviour
 
         gameManager.numCluesFound += 1;
 
-        gameObject.SetActive(false);
+        audioSource.Play();
+
+        MeshRenderer rend = GetComponent<MeshRenderer>();
+        rend.enabled = false;
+        Collider col = GetComponent<Collider>();
+        col.enabled = false;
     }
 }

@@ -36,6 +36,7 @@ public class Player : MonoBehaviour
 
     public AudioClip[] audioClips;
     AudioSource audioSource;
+    public AudioSource aSource;
 
     [Header("References")]
     public Monster monster;
@@ -169,6 +170,11 @@ public class Player : MonoBehaviour
         Interact();
     }
 
+    public void Breathe()
+    {
+        aSource.PlayOneShot(audioClips[1]);
+    }
+
     private bool IsInView(GameObject origin, GameObject toCheck)
     {
         Vector3 pointOnScreen = cam.WorldToScreenPoint(toCheck.GetComponentInChildren<Renderer>().bounds.center);
@@ -189,12 +195,18 @@ public class Player : MonoBehaviour
         }
 
         RaycastHit hit;
+        Vector3 heading = toCheck.transform.position - origin.transform.position;
+        Vector3 direction = heading.normalized;// / heading.magnitude;
 
         if (Physics.Linecast(cam.transform.position, toCheck.GetComponentInChildren<Renderer>().bounds.center, out hit))
         {
             if (hit.transform.name != toCheck.name)
             {
-                // Debug.Log(toCheck.name + " occluded by " + hit.transform.name);
+                /* -->
+                Debug.DrawLine(cam.transform.position, toCheck.GetComponentInChildren<Renderer>().bounds.center, Color.red);
+                Debug.LogError(toCheck.name + " occluded by " + hit.transform.name);
+                */
+                //Debug.Log(toCheck.name + " occluded by " + hit.transform.name);
                 return false;
             }
         }

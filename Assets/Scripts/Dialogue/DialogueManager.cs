@@ -14,6 +14,7 @@ public class DialogueManager : MonoBehaviour
     public Queue<string> sentences;
 
     GameManager gameManager;
+    AudioSource audioSource;
 
     private void Awake()
     {

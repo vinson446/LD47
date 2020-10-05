@@ -155,7 +155,7 @@ public class Monster : MonoBehaviour
             if (gameManager.numCluesFound == 4)
             {
                 gameManager.beatGame = true;
-                SceneManager.LoadScene("Win");
+                SceneManager.LoadScene("End");
             }
             else
             {

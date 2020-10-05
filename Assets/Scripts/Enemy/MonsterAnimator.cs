@@ -75,10 +75,11 @@ public class MonsterAnimator : MonoBehaviour
         if (!firstTimeRoaring)
         {
             roarSource.PlayOneShot(audioClips[1]);
+            player.Breathe();
 
             firstTimeRoaring = true;
             canRoarAgain = false;
-            Invoke("RoarCD", roarCooldown);
+            StartCoroutine(CallBreathe());
         }
         else
         {
@@ -86,15 +87,19 @@ public class MonsterAnimator : MonoBehaviour
             if (tmp == 0 && canRoarAgain)
             {
                 roarSource.PlayOneShot(audioClips[1]);
+                player.Breathe();
 
                 canRoarAgain = false;
-                Invoke("RoarCD", roarCooldown);
+                StartCoroutine(CallBreathe());
             }
         }
     }
 
-    public void RoarCD()
+    IEnumerator CallBreathe()
     {
+        yield return new WaitForSeconds(roarCooldown);
+
+        player.Breathe();
         canRoarAgain = true;
     }
 

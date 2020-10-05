@@ -8,6 +8,8 @@ public class DialogueTrigger : MonoBehaviour
     public Dialogue[] dialogue;
     DialogueManager dialogueManager;
 
+    public float cutsceneWait;
+
     GameManager gameManager;
 
     private void Awake()
@@ -24,9 +26,25 @@ public class DialogueTrigger : MonoBehaviour
 
     public void TriggerGameStartDialogue()
     {
-        if (!gameManager.hasFailed)
+        if (gameManager.beatGame)
+        {
             dialogueManager.StartDialogue(dialogue[0]);
+            StartCoroutine(Cutscene());
+        }
         else
-            dialogueManager.StartDialogue(dialogue[1]);
+        {
+            if (!gameManager.hasFailed)
+                dialogueManager.StartDialogue(dialogue[0]);
+            else
+                dialogueManager.StartDialogue(dialogue[1]);
+        }
+    }
+
+    IEnumerator Cutscene()
+    {
+        yield return new WaitForSeconds(cutsceneWait);
+
+        AudioSource audioSource = FindObjectOfType<AudioSource>();
+        audioSource.Play();
     }
 }
