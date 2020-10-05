@@ -5,6 +5,8 @@ using UnityEngine;
 public class CameraControl : MonoBehaviour
 {
     public float mouseSensitivity = 100;
+    public float xRotLow;
+    public float xRotHigh;
     public Transform playerBody;
 
     float xRot = 0;
@@ -23,7 +25,7 @@ public class CameraControl : MonoBehaviour
 
         // rotate camera when moving mouse vertically
         xRot -= mouseY;
-        xRot = Mathf.Clamp(xRot, -90, 90);
+        xRot = Mathf.Clamp(xRot, xRotLow, xRotHigh);
         transform.localRotation = Quaternion.Euler(xRot, 0, 0);
 
         // rotate player when moving mouse horizontally

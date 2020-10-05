@@ -32,7 +32,7 @@ public class Player : MonoBehaviour
     public float sprintingVolume;
     public float sprintingPitch;
     public float sprintingInterval;
-    public bool canPlaySound = true;
+    public bool startMoveSound = false;
 
     public AudioClip[] audioClips;
     AudioSource audioSource;
@@ -60,8 +60,7 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector3 screenPoint = cam.WorldToViewportPoint(monster.transform.position);
-        monsterOnScreen = screenPoint.z > 0 && screenPoint.x > 0 && screenPoint.x < 1 && screenPoint.y > 0 && screenPoint.y < 1;
+        monsterOnScreen = IsInView(gameObject, monster.gameObject);
 
         /*
         planes = GeometryUtility.CalculateFrustumPlanes(cam);
@@ -84,14 +83,14 @@ public class Player : MonoBehaviour
                 monster.isAggro = true;
             }
 
-            if (!seeMonsterFirstTime && monsterAnimator.enabled)
+            if (!seeMonsterFirstTime && monsterAnimator.enabled && Vector3.Distance(transform.position, monster.transform.position) < 20)
             {
                 monsterAnimator.PlayRoarSound();
 
                 seeMonsterFirstTime = true;
             }
         }
-        else if (Vector3.Distance(transform.position, monster.transform.position) < 30)
+        else if (Vector3.Distance(transform.position, monster.transform.position) < 20)
         {
             monster.isAggro = true;
         }
@@ -112,6 +111,8 @@ public class Player : MonoBehaviour
             else
             {
                 isMoving = false;
+
+                startMoveSound = false;
             }
 
             if (Input.GetKey(KeyCode.LeftShift))
@@ -132,6 +133,25 @@ public class Player : MonoBehaviour
         // move controller;
         charController.Move(moveDirection * Time.deltaTime);
 
+        if (isMoving)
+        {
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                PlaySound(0, Random.Range(sprintingVolume - 0.03f, sprintingVolume + 0.03f), Random.Range(sprintingPitch - 0.03f, sprintingPitch + 0.03f));
+            }
+            else if (Input.GetKeyUp(KeyCode.LeftShift))
+            {
+                PlaySound(0, Random.Range(moveVolume - 0.03f, moveVolume + 0.03f), Random.Range(movePitch - 0.03f, movePitch + 0.03f));
+            }
+            // start move sound
+            else if (!startMoveSound)
+            {
+                PlaySound(0, Random.Range(moveVolume - 0.03f, moveVolume + 0.03f), Random.Range(movePitch - 0.03f, movePitch + 0.03f));
+                startMoveSound = true;
+            }
+        }
+
+        /*
         // play moving sound while player is moving
         if (charController.isGrounded && isMoving && canPlaySound)
         {
@@ -144,8 +164,41 @@ public class Player : MonoBehaviour
                 PlaySound(0, Random.Range(sprintingVolume - 0.03f, sprintingVolume + 0.03f), Random.Range(sprintingPitch - 0.03f, sprintingPitch + 0.03f));
             }
         }
+        */
 
         Interact();
+    }
+
+    private bool IsInView(GameObject origin, GameObject toCheck)
+    {
+        Vector3 pointOnScreen = cam.WorldToScreenPoint(toCheck.GetComponentInChildren<Renderer>().bounds.center);
+
+        //Is in front
+        if (pointOnScreen.z < 0)
+        {
+            // Debug.Log("Behind: " + toCheck.name);
+            return false;
+        }
+
+        //Is in FOV
+        if ((pointOnScreen.x < 0) || (pointOnScreen.x > Screen.width) ||
+                (pointOnScreen.y < 0) || (pointOnScreen.y > Screen.height))
+        {
+            // Debug.Log("OutOfBounds: " + toCheck.name);
+            return false;
+        }
+
+        RaycastHit hit;
+
+        if (Physics.Linecast(cam.transform.position, toCheck.GetComponentInChildren<Renderer>().bounds.center, out hit))
+        {
+            if (hit.transform.name != toCheck.name)
+            {
+                // Debug.Log(toCheck.name + " occluded by " + hit.transform.name);
+                return false;
+            }
+        }
+        return true;
     }
 
     void Interact()
@@ -166,26 +219,27 @@ public class Player : MonoBehaviour
 
     void PlaySound(int index, float volume, float pitch)
     {
+        StopAllCoroutines();
+        StartCoroutine(PlaySoundCoroutine(index, volume, pitch));
+    }
+
+    IEnumerator PlaySoundCoroutine(int index, float volume, float pitch)
+    {
+        audioSource.clip = audioClips[index];
         audioSource.volume = volume;
         audioSource.pitch = pitch;
 
-        audioSource.PlayOneShot(audioClips[index]);
-        canPlaySound = false;
-
-        StartCoroutine(PlaySound());
-    }
-
-    IEnumerator PlaySound()
-    { 
-        if (isWalking)
+        while (isMoving)
         {
-            yield return new WaitForSeconds(moveInterval);
-            canPlaySound = true;
-        }
-        else
-        {
-            yield return new WaitForSeconds(sprintingInterval);
-            canPlaySound = true;
+            if (audioSource.isPlaying)
+                audioSource.Stop();
+
+            audioSource.Play();
+
+            if (isWalking)
+                yield return new WaitForSeconds(moveInterval);
+            else
+                yield return new WaitForSeconds(sprintingInterval);
         }
     }
 

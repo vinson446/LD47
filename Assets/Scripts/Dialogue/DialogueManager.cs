@@ -61,7 +61,7 @@ public class DialogueManager : MonoBehaviour
         foreach (char letter in sentence.ToCharArray())
         {
             textBox.text += letter;
-            yield return new WaitForSeconds(0.05f);
+            yield return new WaitForSeconds(0.04f);
         }
     }
 
@@ -69,12 +69,18 @@ public class DialogueManager : MonoBehaviour
     {
         textGameObject.SetActive(false);
 
-        objective.SetActive(true);
-        clues.SetActive(true);
+        if (!gameManager.beatGame)
+        {
+            objective.SetActive(true);
+            clues.SetActive(true);
 
-        Monster monster = FindObjectOfType<Monster>();
-        monster.enabled = true;
-        MonsterAnimator monsterAnimator = monster.GetComponent<MonsterAnimator>();
-        monsterAnimator.enabled = true;
+            Player player = FindObjectOfType<Player>();
+            player.enabled = true;
+
+            Monster monster = FindObjectOfType<Monster>();
+            monster.enabled = true;
+            MonsterAnimator monsterAnimator = monster.GetComponent<MonsterAnimator>();
+            monsterAnimator.enabled = true;
+        }
     }
 }

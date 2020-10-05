@@ -127,8 +127,10 @@ public class Monster : MonoBehaviour
         {
             MonsterSprinting.Invoke();
 
-            if (Vector3.Distance(transform.position, target.transform.position) < 50)
+            if (Vector3.Distance(transform.position, target.transform.position) < 20)
+            {
                 monsterAnimator.PlayRoarSound();
+            }
 
             isSprinting = true;
         }
@@ -152,12 +154,19 @@ public class Monster : MonoBehaviour
 
             if (gameManager.numCluesFound == 4)
             {
-                SceneManager.LoadScene("Main Menu");
+                gameManager.beatGame = true;
+                SceneManager.LoadScene("Win");
             }
             else
             {
                 SceneManager.LoadScene("Game");
             }
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, 20);
     }
 }

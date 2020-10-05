@@ -21,7 +21,10 @@ public class MonsterAnimator : MonoBehaviour
     public float sprintingVolume;
     public float sprintingPitch;
     public float sprintingInterval;
+
+    public float roarCooldown;
     public bool firstTimeRoaring = false;
+    public bool canRoarAgain = true;
 
     public AudioClip[] audioClips;
     public AudioSource roarSource;
@@ -72,16 +75,27 @@ public class MonsterAnimator : MonoBehaviour
         if (!firstTimeRoaring)
         {
             roarSource.PlayOneShot(audioClips[1]);
+
             firstTimeRoaring = true;
+            canRoarAgain = false;
+            Invoke("RoarCD", roarCooldown);
         }
         else
         {
             float tmp = Random.Range(0, 4);
-            if (tmp == 0)
+            if (tmp == 0 && canRoarAgain)
             {
                 roarSource.PlayOneShot(audioClips[1]);
+
+                canRoarAgain = false;
+                Invoke("RoarCD", roarCooldown);
             }
         }
+    }
+
+    public void RoarCD()
+    {
+        canRoarAgain = true;
     }
 
     IEnumerator PlaySoundCoroutine(int index, float volume, float pitch)

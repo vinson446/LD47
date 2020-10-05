@@ -8,7 +8,11 @@ using TMPro;
 
 public class MainMenu : MonoBehaviour
 {
+    [Header("Visual Settings")]
+    public float fadeInTime;
+
     [Header("Text References")]
+    public TextMeshProUGUI gameNameText;
     public TextMeshProUGUI playText;
     public TextMeshProUGUI quitText;
 
@@ -34,12 +38,18 @@ public class MainMenu : MonoBehaviour
     void Start()
     {
         Cursor.lockState = CursorLockMode.None;
+
+        StartCoroutine(Fade(1));
     }
 
-    // Update is called once per frame
-    void Update()
+    IEnumerator Fade(float alpha)
     {
-        
+        gameNameText.DOFade(1, fadeInTime);
+
+        yield return new WaitForSeconds(fadeInTime);
+
+        playText.DOFade(1, fadeInTime);
+        quitText.DOFade(1, fadeInTime);
     }
 
     public void HoverStartGame()
@@ -57,6 +67,10 @@ public class MainMenu : MonoBehaviour
     {
         startGame = true;
         playText.DOColor(clickColor, colorTransitionTime);
+
+        gameNameText.DOFade(0, fadeInTime);
+        playText.DOFade(0, fadeInTime);
+        quitText.DOFade(0, fadeInTime);
 
         float currentTime = 0;
         while (currentTime < 2)

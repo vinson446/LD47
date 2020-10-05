@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     [Header("Visual Settings")]
 
     [Header("Game Settings")]
+    public bool beatGame = false;
     public int numCluesFound = 0;
     public bool hasFailed = false;
 
