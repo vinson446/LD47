@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -81,6 +82,10 @@ public class DialogueManager : MonoBehaviour
             monster.enabled = true;
             MonsterAnimator monsterAnimator = monster.GetComponent<MonsterAnimator>();
             monsterAnimator.enabled = true;
+        }
+        else
+        {
+            SceneManager.LoadScene(0);
         }
     }
 }
